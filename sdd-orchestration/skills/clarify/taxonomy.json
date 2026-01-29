@@ -1,0 +1,131 @@
+{
+  "categories": [
+    {
+      "id": "functional_scope",
+      "name": "Functional Scope & Behavior",
+      "description": "핵심 목표, 성공 기준, out-of-scope 선언",
+      "check_items": [
+        "Core user goals & success criteria",
+        "Explicit out-of-scope declarations",
+        "User roles / personas differentiation"
+      ],
+      "impact": "high",
+      "stages": ["specify", "plan", "task"]
+    },
+    {
+      "id": "domain_data_model",
+      "name": "Domain & Data Model",
+      "description": "엔티티, 속성, 관계, 상태 전이, 스케일",
+      "check_items": [
+        "Entities, attributes, relationships",
+        "Identity & uniqueness rules",
+        "Lifecycle/state transitions",
+        "Data volume / scale assumptions"
+      ],
+      "impact": "high",
+      "stages": ["specify", "plan"]
+    },
+    {
+      "id": "interaction_ux",
+      "name": "Interaction & UX Flow",
+      "description": "사용자 여정, 에러/로딩 상태, 접근성",
+      "check_items": [
+        "Critical user journeys / sequences",
+        "Error/empty/loading states",
+        "Accessibility or localization notes"
+      ],
+      "impact": "medium",
+      "stages": ["specify", "task"]
+    },
+    {
+      "id": "non_functional",
+      "name": "Non-Functional Quality Attributes",
+      "description": "성능, 확장성, 가용성, 보안",
+      "check_items": [
+        "Performance (latency, throughput targets)",
+        "Scalability (horizontal/vertical, limits)",
+        "Reliability & availability (uptime, recovery)",
+        "Observability (logging, metrics, tracing)",
+        "Security & privacy (authN/Z, data protection)",
+        "Compliance / regulatory constraints"
+      ],
+      "impact": "high",
+      "stages": ["plan", "task"]
+    },
+    {
+      "id": "integration",
+      "name": "Integration & External Dependencies",
+      "description": "외부 API, 실패 모드, 프로토콜",
+      "check_items": [
+        "External services/APIs and failure modes",
+        "Data import/export formats",
+        "Protocol/versioning assumptions"
+      ],
+      "impact": "medium",
+      "stages": ["plan", "task"]
+    },
+    {
+      "id": "edge_cases",
+      "name": "Edge Cases & Failure Handling",
+      "description": "부정 시나리오, 충돌 해결",
+      "check_items": [
+        "Negative scenarios",
+        "Rate limiting / throttling",
+        "Conflict resolution (e.g., concurrent edits)"
+      ],
+      "impact": "medium",
+      "stages": ["task", "revise"]
+    },
+    {
+      "id": "constraints",
+      "name": "Constraints & Tradeoffs",
+      "description": "기술 제약, 명시적 트레이드오프",
+      "check_items": [
+        "Technical constraints (language, storage, hosting)",
+        "Explicit tradeoffs or rejected alternatives"
+      ],
+      "impact": "high",
+      "stages": ["plan"]
+    },
+    {
+      "id": "terminology",
+      "name": "Terminology & Consistency",
+      "description": "용어 정의, 동의어 정리",
+      "check_items": [
+        "Canonical glossary terms",
+        "Avoided synonyms / deprecated terms"
+      ],
+      "impact": "low",
+      "stages": ["specify"]
+    },
+    {
+      "id": "completion_signals",
+      "name": "Completion Signals",
+      "description": "수락 기준, DoD 지표",
+      "check_items": [
+        "Acceptance criteria testability",
+        "Measurable Definition of Done indicators"
+      ],
+      "impact": "medium",
+      "stages": ["specify", "task"]
+    },
+    {
+      "id": "misc",
+      "name": "Misc / Placeholders",
+      "description": "TODO 마커, 모호한 형용사",
+      "check_items": [
+        "TODO markers / unresolved decisions",
+        "Ambiguous adjectives (robust, intuitive) lacking quantification"
+      ],
+      "impact": "low",
+      "stages": ["specify", "plan", "task", "revise"]
+    }
+  ],
+  "question_rules": {
+    "max_questions_per_session": 10,
+    "question_format": "multiple_choice_or_short",
+    "max_options": 5,
+    "max_short_answer_words": 5,
+    "prioritization": "impact_x_uncertainty"
+  }
+}

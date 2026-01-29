@@ -1,0 +1,34 @@
+{
+  "version": "2.0",
+  "observation": {
+    "enabled": true,
+    "store_path": ".cursor/tmp/observations.jsonl",
+    "max_file_size_mb": 10,
+    "archive_after_days": 7,
+    "capture_tools": ["Edit", "Write", "StrReplace", "Shell", "Read", "Grep", "Glob", "SemanticSearch"],
+    "ignore_tools": ["TodoWrite", "AskQuestion"]
+  },
+  "instincts": {
+    "path": ".cursor/instincts/",
+    "min_confidence": 0.3,
+    "auto_approve_threshold": 0.7,
+    "confidence_decay_rate": 0.02,
+    "max_instincts": 100,
+    "domains": ["code-style", "testing", "debugging", "workflow", "git", "validation"]
+  },
+  "observer": {
+    "enabled": true,
+    "min_observations": 20,
+    "patterns_to_detect": [
+      "error_resolutions",
+      "user_corrections",
+      "repeated_workflows",
+      "tool_preferences"
+    ]
+  },
+  "evolution": {
+    "cluster_threshold": 3,
+    "evolved_path": ".cursor/evolved/",
+    "min_confidence_for_evolution": 0.8
+  }
+}

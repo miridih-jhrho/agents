@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "description": "Agentic Utils Hook Configuration",
+  "hooks": {
+    "sessionStart": [
+      {
+        "command": "node general-agentic-utils/hooks/session-start.js",
+        "description": "이전 컨텍스트 탐색 및 복원 안내"
+      },
+      {
+        "command": "node general-agentic-utils/hooks/reset-strategic-state.js",
+        "description": "Strategic compact 상태 초기화"
+      }
+    ],
+    "sessionEnd": [
+      {
+        "command": "node general-agentic-utils/hooks/session-end.js",
+        "description": "세션 컨텍스트 자동 저장"
+      },
+      {
+        "command": "node general-agentic-utils/hooks/analyze-observations.js",
+        "description": "관찰 데이터 분석 및 패턴 감지"
+      }
+    ],
+    "preCompact": [
+      {
+        "command": "node general-agentic-utils/hooks/pre-compact.js",
+        "description": "압축 전 스냅샷 저장"
+      }
+    ],
+    "preToolUse": [
+      {
+        "command": "node general-agentic-utils/hooks/observe.js pre",
+        "description": "도구 사용 전 관찰 기록"
+      },
+      {
+        "command": "node general-agentic-utils/hooks/strategic-compact.js",
+        "matcher": "Write|StrReplace|Edit",
+        "description": "파일 수정 시 압축 제안 확인"
+      }
+    ],
+    "postToolUse": [
+      {
+        "command": "node general-agentic-utils/hooks/observe.js post",
+        "description": "도구 사용 후 결과 기록"
+      }
+    ],
+    "afterFileEdit": [
+      {
+        "command": "node general-agentic-utils/hooks/strategic-compact.js",
+        "description": "파일 편집 후 압축 제안 확인"
+      }
+    ],
+    "stop": [
+      {
+        "command": "node general-agentic-utils/hooks/session-end.js",
+        "description": "에이전트 중지 시 컨텍스트 저장"
+      }
+    ]
+  },
+  "config": {
+    "observation": {
+      "enabled": true,
+      "maxFileSizeMB": 10,
+      "archiveAfterDays": 7
+    },
+    "strategicCompact": {
+      "firstThreshold": 20,
+      "reminderInterval": 10,
+      "criticalThreshold": 50
+    },
+    "instincts": {
+      "minConfidence": 0.3,
+      "autoApproveThreshold": 0.7,
+      "confidenceDecayRate": 0.05
+    },
+    "contextFiles": {
+      "keepCount": 10,
+      "location": ".cursor/tmp"
+    }
+  }
+}
