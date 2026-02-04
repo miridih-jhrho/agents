@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "description": "Agentic Utils Hook Configuration",
+  "hooks": {
+    "sessionStart": [
+      {
+        "command": "node .cursor/hooks/session-start.js"
+      },
+      {
+        "command": "node .cursor/hooks/reset-strategic-state.js"
+      }
+    ],
+    "sessionEnd": [
+      {
+        "command": "node .cursor/hooks/session-end.js"
+      },
+      {
+        "command": "node .cursor/hooks/analyze-observations.js"
+      }
+    ],
+    "preCompact": [
+      {
+        "command": "node .cursor/hooks/pre-compact.js"
+      }
+    ],
+    "preToolUse": [
+      {
+        "command": "node .cursor/hooks/observe.js pre"
+      },
+      {
+        "command": "node .cursor/hooks/strategic-compact.js",
+        "matcher": "Write|StrReplace|Edit"
+      }
+    ],
+    "postToolUse": [
+      {
+        "command": "node .cursor/hooks/observe.js post"
+      }
+    ],
+    "afterFileEdit": [
+      {
+        "command": "node .cursor/hooks/strategic-compact.js"
+      }
+    ],
+    "stop": [
+      {
+        "command": "node .cursor/hooks/session-end.js"
+      }
+    ]
+  },
+  "config": {
+    "observation": {
+      "enabled": true,
+      "maxFileSizeMB": 10,
+      "archiveAfterDays": 7
+    },
+    "strategicCompact": {
+      "firstThreshold": 20,
+      "reminderInterval": 10,
+      "criticalThreshold": 50
+    },
+    "instincts": {
+      "minConfidence": 0.3,
+      "autoApproveThreshold": 0.7,
+      "confidenceDecayRate": 0.05
+    },
+    "contextFiles": {
+      "keepCount": 10,
+      "location": ".cursor/tmp"
+    }
+  }
+}

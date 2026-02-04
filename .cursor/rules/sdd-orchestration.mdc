@@ -1,0 +1,255 @@
+---
+alwaysApply: true
+---
+# SDD Orchestration
+
+Spec-Driven Development 워크플로우를 정의합니다. 기능 개발 시 명세화 → 설계 → 태스크 → 구현 → 검증 → 명세 동기화 흐름을 따릅니다.
+
+## 워크플로우 개요
+
+```
+/specify → /plan → /task → /implement → /verify → /spec-update
+                                            ↓
+                                        (실패 시)
+                                         /revise ↔ /verify
+```
+
+## 핵심 원칙
+
+### 1. Clarify 필수
+
+모든 단계(specify, plan, task, revise)에서 **반드시** clarify 프로세스를 거칩니다.
+
+- Ambiguity Scan (10개 카테고리)
+- 모호한 부분 질문 (한 번에 1개)
+- 추천 옵션 제시
+- 답변 즉시 체크포인트에 기록
+
+### 2. 체크포인트 기반
+
+임시 문서(체크포인트)로 작업하고, 완료 시 최종 문서로 통합합니다.
+
+```
+docs/.checkpoints/           # 작업 중 (임시)
+├── {feature}-specify.md
+├── {feature}-plan.md
+└── {feature}-task.md
+        ↓
+docs/modules/                # 최종 명세
+docs/decisions/              # 최종 ADR
+```
+
+### 3. Task 단위 커밋
+
+implement 단계에서 각 태스크 완료 시 커밋합니다.
+
+```
+{type}({scope}): {message} [{task_id}]
+```
+
+### 4. 단계 전환
+
+각 단계 완료 시 다음 단계를 추천하고, 사용자 선택에 따라 자동 실행합니다.
+
+## 명령어
+
+| 명령어 | 역할 | 출력 |
+|--------|------|------|
+| `/specify` | 기능 명세화 | {feature}-specify.md |
+| `/plan` | 아키텍처 설계 | {feature}-plan.md |
+| `/task` | 태스크 분리 | {feature}-task.md |
+| `/implement` | 코드 구현 | 코드 + 커밋 |
+| `/verify` | 테스트/리뷰 | 검증 리포트 |
+| `/revise` | 이슈 수정 | 수정된 코드 |
+| `/spec-update` | 명세 동기화 | modules/, decisions/ |
+
+## Ambiguity Scan 카테고리
+
+| 카테고리 | 분석 대상 |
+|----------|----------|
+| Functional Scope | 핵심 목표, 성공 기준, out-of-scope |
+| Domain & Data Model | 엔티티, 관계, 상태 전이 |
+| Interaction & UX | 사용자 여정, 에러 상태 |
+| Non-Functional | 성능, 확장성, 보안 |
+| Integration | 외부 API, 실패 모드 |
+| Edge Cases | 부정 시나리오, 충돌 해결 |
+| Constraints | 기술 제약, 트레이드오프 |
+| Terminology | 용어 정의 |
+| Completion Signals | 수락 기준, DoD |
+| Misc | TODO, 모호한 형용사 |
+
+## 질문 규칙
+
+- 세션당 **최대 10개** 질문
+- 한 번에 **1개씩** 순차 출력
+- **추천 옵션** 반드시 제시
+- Impact × Uncertainty 우선순위
+
+### 질문 형식
+
+```markdown
+**Recommended:** Option A - <추천 이유>
+
+| Option | Description |
+|--------|-------------|
+| A | <설명> |
+| B | <설명> |
+
+Reply with option letter, "yes", or short answer (<=5 words).
+```
+
+## 단계별 체크포인트 참조
+
+| 단계 | 생성 | 참조 |
+|------|------|------|
+| specify | {feature}-specify.md | - |
+| plan | {feature}-plan.md | specify |
+| task | {feature}-task.md | specify, plan |
+| implement | 코드 | 모든 체크포인트 |
+| verify | 리포트 | 모든 체크포인트 |
+| revise | 수정 | 모든 체크포인트 |
+| spec-update | modules/, decisions/ | 모든 체크포인트 → 삭제 |
+
+## 커밋 메시지
+
+`skills/implement/config.json`에서 형식 설정:
+
+```json
+{
+  "commit": {
+    "format": "{type}({scope}): {message}",
+    "include_task_id": true,
+    "task_id_position": "suffix"
+  }
+}
+```
+
+### 타입
+
+| Type | 용도 |
+|------|------|
+| feat | 새 기능 |
+| fix | 버그 수정 |
+| refactor | 리팩토링 |
+| test | 테스트 |
+| docs | 문서 |
+| chore | 빌드, 설정 |
+
+### 예시
+
+```
+feat(auth): add JWT token validation [TASK-001]
+fix(api): handle null response [TASK-002]
+test(auth): add login integration tests [TASK-003]
+```
+
+## 에이전트
+
+### test-agent
+
+- **역할**: 테스트 실행, 커버리지 분석
+- **호출**: /verify에서 자동
+- **model**: fast
+- **readonly**: true
+
+### review-agent
+
+- **역할**: 코드 리뷰, 보안 검토
+- **호출**: /verify에서 자동
+- **model**: inherit
+- **readonly**: true
+
+## 단계 전환 패턴
+
+각 단계 완료 시:
+
+```markdown
+## {Stage} 완료
+
+**체크포인트**: docs/.checkpoints/{feature}-{stage}.md
+**상태**: Ready
+
+---
+
+**다음 단계**: /{next-stage}
+
+| Option | Action |
+|--------|--------|
+| yes | /{next-stage} 바로 실행 |
+| no | 대기 |
+
+Reply: yes, no, or another command
+```
+
+### 전환 맵
+
+| 현재 | 다음 (기본) | 조건부 |
+|------|------------|--------|
+| specify | plan | |
+| plan | task | |
+| task | implement | |
+| implement | verify | |
+| verify | spec-update | 통과 시 |
+| verify | revise | 실패 시 |
+| revise | verify | |
+| spec-update | 완료 | |
+
+## 트리거 키워드
+
+다음 키워드 감지 시 해당 단계 실행:
+
+| 단계 | 키워드 |
+|------|--------|
+| /specify | 명세, 기능 정의, 요구사항, 새 기능 |
+| /plan | 설계, 아키텍처, 구조 |
+| /task | 태스크, 작업 분리, TODO |
+| /implement | 구현, 코딩, 개발 |
+| /verify | 검증, 테스트, 리뷰 |
+| /revise | 수정, 고치기, fix |
+| /spec-update | 명세 동기화, 문서화, 정리 |
+
+## 문서 위치
+
+```
+docs/
+├── .checkpoints/           # 작업 중 체크포인트 (임시)
+│   ├── {feature}-specify.md
+│   ├── {feature}-plan.md
+│   └── {feature}-task.md
+├── modules/                # 최종 모듈 명세
+│   └── {module}/README.md
+└── decisions/              # 최종 ADR
+    └── {num}-{title}.md
+```
+
+## 스킬 경로
+
+이 워크플로우의 스킬들은 다음 위치에 있습니다:
+
+```
+sdd-orchestration/
+├── skills/
+│   ├── clarify/SKILL.md
+│   ├── specify/SKILL.md
+│   ├── plan/SKILL.md
+│   ├── task/SKILL.md
+│   ├── implement/SKILL.md
+│   ├── verify/SKILL.md
+│   ├── revise/SKILL.md
+│   └── spec-update/SKILL.md
+├── agents/
+│   ├── test-agent.md
+│   └── review-agent.md
+└── templates/
+    ├── checkpoint-*.md
+    ├── module-spec.md
+    └── adr.md
+```
+
+## 주의사항
+
+1. **체크포인트 우선**: 코드 작성 전 체크포인트 확인
+2. **clarify 필수**: 모호함 해소 없이 진행 금지
+3. **task 단위 커밋**: 한 번에 여러 태스크 커밋 금지
+4. **verify 필수**: implement 후 반드시 /verify 실행
+5. **체크포인트 정리**: spec-update에서 체크포인트 삭제 확인
