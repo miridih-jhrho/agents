@@ -109,6 +109,8 @@ where:
 
 **한 번에 1개 질문만** 출력합니다.
 
+사용자가 선택할 수 있도록 객관식 질문을 출력합니다.
+
   - For multiple‑choice questions:
        - **Analyze all options** and determine the **most suitable option** based on:
           - Best practices for the project type

@@ -1,7 +1,0 @@
-{"timestamp":"2026-02-04T08:24:00.494Z","event":"preToolUse","tool":"unknown"}
-{"timestamp":"2026-02-04T08:24:00.542Z","event":"postToolUse","tool":"unknown","success":true}
-{"timestamp":"2026-02-04T08:24:25.439Z","event":"preToolUse","tool":"unknown"}
-{"timestamp":"2026-02-04T08:24:25.643Z","event":"preToolUse","tool":"unknown"}
-{"timestamp":"2026-02-04T08:24:26.484Z","event":"postToolUse","tool":"unknown","success":true}
-{"timestamp":"2026-02-04T08:24:29.539Z","event":"preToolUse","tool":"unknown"}
-{"timestamp":"2026-02-04T08:24:30.170Z","event":"postToolUse","tool":"unknown","success":true}
