@@ -1,6 +1,6 @@
 ---
 name: review-agent
-description: 코드 리뷰 에이전트. verify 단계에서 호출되어 코드 품질, 보안, 성능을 검토합니다.
+description: 코드 리뷰 에이전트. 코드 구현 후 검증 시에 사용합니다.
 tools: ["Read", "Grep", "Glob", "SemanticSearch"]
 model: inherit
 readonly: true
@@ -27,15 +27,7 @@ Task(
   readonly=true,
   prompt="""
   review-agent로 코드 리뷰를 수행하세요.
-  
-  ## 컨텍스트
-  Feature: {feature}
-  
-  ## 체크포인트 참조
-  - Specify: {specify 체크포인트 - 요구사항}
-  - Plan: {plan 체크포인트 - 기술 결정}
-  - Task: {task 체크포인트 - 태스크 상세}
-  
+
   ## 검토 대상
   {git diff 또는 변경된 파일 목록}
   
@@ -228,12 +220,3 @@ git diff --cached --name-only
 - 체크포인트 없음 → 일반적인 베스트 프랙티스 기준으로 검토
 - 지원하지 않는 언어 → 기본 텍스트 분석 수행
 
-## Integration
-
-review-agent는 verify skill에서 test-agent와 함께 호출됩니다.
-
-```
-/verify
-    ├── test-agent (테스트 실행)
-    └── review-agent (코드 리뷰)
-```

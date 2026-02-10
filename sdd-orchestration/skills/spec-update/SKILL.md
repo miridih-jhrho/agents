@@ -1,15 +1,10 @@
 ---
 name: spec-update
-description: 명세 동기화 단계. 모든 체크포인트를 최종 문서(modules/, decisions/)로 통합하고 체크포인트를 삭제합니다.
+description: 명세 동기화 단계. 코드 구현과 검증이 끝난 경우 실행되어 명세 문서를 업데이트합니다.
 ---
-
-# Spec-Update Skill
-
-체크포인트를 최종 명세 문서로 통합하고 정리합니다.
 
 ## When to Use
 
-- `/spec-update` 명령 시
 - verify 성공 후 자동 전환 시
 - "명세 동기화", "문서화", "정리" 키워드 시
 
@@ -17,9 +12,9 @@ description: 명세 동기화 단계. 모든 체크포인트를 최종 문서(mo
 
 - verify 통과 (status: PASS)
 - 모든 체크포인트 존재:
-  - `docs/.checkpoints/{feature}-specify.md`
-  - `docs/.checkpoints/{feature}-plan.md`
-  - `docs/.checkpoints/{feature}-task.md`
+  - `docs/.checkpoints/{feature}/specify.md`
+  - `docs/.checkpoints/{feature}/plan.md`
+  - `docs/.checkpoints/{feature}/task.md`
 
 ## Process
 
@@ -38,20 +33,20 @@ flowchart TD
 모든 체크포인트와 git diff를 분석합니다.
 
 ```
-docs/.checkpoints/{feature}-specify.md
+docs/.checkpoints/{feature}/specify.md
 - Feature Overview
 - Functional Requirements
 - Acceptance Criteria
 - Clarifications
 
-docs/.checkpoints/{feature}-plan.md
+docs/.checkpoints/{feature}/plan.md
 - Architecture Overview
 - Technology Stack
 - Data Model
 - Technical Decisions
 - Clarifications
 
-docs/.checkpoints/{feature}-task.md
+docs/.checkpoints/{feature}/task.md
 - Task List
 - Task Details
 - Clarifications
@@ -67,7 +62,8 @@ git diff --stat HEAD~{N}...HEAD
 
 ## Step 2: Generate Module Spec
 
-`docs/modules/{module}/README.md`를 생성합니다.
+- `docs/modules/{module}/README.md`를 생성합니다.
+- 이미 있는 경우, 업데이트합ㄴ디ㅏ.
 
 ### 모듈 경로 결정
 
@@ -98,11 +94,8 @@ Reply "yes" to accept, or provide a different path.
 
 ### Public Functions
 
-```typescript
-async function login(email: string, password: string): Promise<AuthToken>
-async function logout(token: string): Promise<void>
-async function verifyToken(token: string): Promise<User>
-async function refreshToken(token: string): Promise<AuthToken>
+```java
+public boolean contains(Object o);
 ```
 
 ### Events / Hooks
@@ -111,19 +104,12 @@ async function refreshToken(token: string): Promise<AuthToken>
 
 ## Data Model
 
-```typescript
-interface User {
-  id: string;
-  email: string;
-  passwordHash: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-interface AuthToken {
-  accessToken: string;
-  refreshToken: string;
-  expiresIn: number;
+```java
+class User {
+  private final String id;
+  public String getId() {
+    return this.id;
+  }
 }
 ```
 
@@ -134,21 +120,12 @@ interface AuthToken {
 
 ## Usage Examples
 
-```typescript
-// 로그인
-const tokens = await auth.login('user@example.com', 'password');
-
-// 토큰 검증
-const user = await auth.verifyToken(tokens.accessToken);
-
-// 로그아웃
-await auth.logout(tokens.accessToken);
+```java
+final User user = new User("1");
 ```
 
 ## Error Handling
-- `InvalidCredentialsError`: 잘못된 이메일/비밀번호
-- `TokenExpiredError`: 토큰 만료
-- `InvalidTokenError`: 유효하지 않은 토큰
+- `InvalidCredentialsException`: 잘못된 이메일/비밀번호
 
 ## Related Decisions
 - [ADR-001: JWT 기반 인증 선택](../decisions/001-auth-jwt.md)
@@ -242,9 +219,9 @@ Accepted
 **체크포인트 삭제 확인**
 
 다음 파일들이 삭제됩니다:
-- docs/.checkpoints/auth-login-specify.md
-- docs/.checkpoints/auth-login-plan.md
-- docs/.checkpoints/auth-login-task.md
+- docs/.checkpoints/auth-login/specify.md
+- docs/.checkpoints/auth-login/plan.md
+- docs/.checkpoints/auth-login/task.md
 
 모든 내용이 최종 문서에 통합되었습니다.
 
@@ -254,7 +231,7 @@ Reply "yes" to delete, or "no" to keep.
 삭제 후:
 
 ```bash
-rm docs/.checkpoints/{feature}-*.md
+rm docs/.checkpoints/{feature}/*.md
 
 # .checkpoints 폴더가 비면 폴더도 삭제
 rmdir docs/.checkpoints 2>/dev/null || true
@@ -278,9 +255,9 @@ rmdir docs/.checkpoints 2>/dev/null || true
   - JWT 기반 인증 선택 결정
 
 ### 삭제된 체크포인트
-- ✓ docs/.checkpoints/auth-login-specify.md
-- ✓ docs/.checkpoints/auth-login-plan.md
-- ✓ docs/.checkpoints/auth-login-task.md
+- ✓ docs/.checkpoints/auth-login/specify.md
+- ✓ docs/.checkpoints/auth-login/plan.md
+- ✓ docs/.checkpoints/auth-login/task.md
 
 ### Summary
 - Module specs: 1 created
@@ -296,11 +273,13 @@ rmdir docs/.checkpoints 2>/dev/null || true
 **Commits**: 9
 **Files changed**: 18
 
-### 새 기능을 시작하시겠습니까?
+### learning 
+
+이번 세션에서 에이전트가 배워야하는 것이 있는 경우, learn 커맨드를 실행합니다.
 
 | Option | Action |
 |--------|--------|
-| yes | 새 기능에 대해 /specify 실행 |
+| yes | /learn 실행 |
 | no | 종료 |
 
 Reply: yes, no, or a new feature request
@@ -310,7 +289,7 @@ Reply: yes, no, or a new feature request
 
 - 생성: `docs/modules/{module}/README.md`
 - 생성: `docs/decisions/{num}-{title}.md`
-- 삭제: `docs/.checkpoints/{feature}-*.md`
+- 삭제: `docs/.checkpoints/{feature}/*.md`
 - 워크플로우 종료
 
 ## Error Handling
@@ -351,5 +330,5 @@ Reply: yes, no, or a new feature request
     ↓
 [워크플로우 완료]
     ↓
-새 기능? → /specify
+사용자 응답? → /learn 실행
 ```

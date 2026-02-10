@@ -1,6 +1,6 @@
 ---
 name: test-agent
-description: 테스트 실행 및 분석 에이전트. verify 단계에서 호출되어 테스트를 실행하고 결과를 분석합니다.
+description: 테스트 실행 및 분석 에이전트. 코드 구현 후 검증 시에 사용합니다.
 tools: ["Shell", "Read", "Grep", "Glob"]
 model: fast
 readonly: true
@@ -27,16 +27,6 @@ Task(
   readonly=true,
   prompt="""
   test-agent로 테스트를 실행하세요.
-  
-  ## 컨텍스트
-  Feature: {feature}
-  Checkpoints: {checkpoint_paths}
-  
-  ## Acceptance Criteria
-  {specify 체크포인트에서 로드}
-  
-  ## Task Test Strategies
-  {task 체크포인트에서 로드}
   
   ## 실행 항목
   1. 단위 테스트 실행
@@ -78,34 +68,16 @@ Task(
 
 프로젝트의 테스트 프레임워크를 감지합니다.
 
-```bash
-# package.json 확인
-cat package.json | grep -E "(jest|mocha|vitest|pytest|go test)"
-
-# 테스트 디렉토리 확인
-ls -la test/ tests/ __tests__/ spec/ 2>/dev/null
-```
 
 ### Step 2: Run Tests
 
 프레임워크에 따라 테스트를 실행합니다.
 
-```bash
-# JavaScript/TypeScript
-npm run test -- --coverage --json --outputFile=test-results.json
-
-# Python
-pytest --cov --cov-report=json -v
-
-# Go
-go test -v -cover ./...
-```
-
 ### Step 3: Parse Results
 
 테스트 결과를 파싱하여 구조화합니다.
 
-```javascript
+```json
 // test-results.json 예시
 {
   "numTotalTests": 25,

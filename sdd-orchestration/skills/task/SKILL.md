@@ -1,22 +1,27 @@
 ---
 name: task
-description: 태스크 분리 단계. specify와 plan 체크포인트를 참조하여 구현 태스크를 분리하고 task 체크포인트를 생성합니다.
+description: 기능 구현 전 세부 작업들을 정리하는 단계. 문서화된 기능 명세와 설계를 바탕으로 구현 태스크를 최소 단위로 분리합니다. 설계 이후 구현 직전 단계에서 사용합니다.
 ---
 
-# Task Skill
+## User Input
 
-설계를 바탕으로 구현 태스크를 분리하고 순서를 정합니다.
+```text
+$ARGUMENTS
+```
+
+You **MUST** consider the user input before proceeding (if not empty).
+
 
 ## When to Use
 
-- `/task` 명령 시
+- 기능 구현 직전
 - plan 완료 후 자동 전환 시
 - "태스크", "작업 분리", "TODO" 키워드 시
 
 ## Prerequisites
 
-- `docs/.checkpoints/{feature}-specify.md` 존재 (status: ready)
-- `docs/.checkpoints/{feature}-plan.md` 존재 (status: ready)
+- `docs/.checkpoints/{feature}/specify.md` 존재 (status: ready)
+- `docs/.checkpoints/{feature}/plan.md` 존재 (status: ready)
 - 없으면 이전 단계 먼저 실행 안내
 
 ## Process
@@ -39,67 +44,36 @@ flowchart TD
 ## Step 1: Load Previous Checkpoints
 
 ```
-docs/.checkpoints/{feature}-specify.md
+docs/.checkpoints/{feature}/specify.md
 - Functional Requirements
 - Acceptance Criteria
 
-docs/.checkpoints/{feature}-plan.md
+docs/.checkpoints/{feature}/plan.md
 - Architecture Overview
 - Component Design
 - File Structure
 - Technical Decisions
 ```
+**Load design documents**: Read from FEATURE_DIR:
+   - **Required**: plan.md (tech stack, libraries, structure), spec.md (user stories with priorities)
+**Execute task generation workflow**:
+  - Load plan.md and extract tech stack, libraries, project structure
+  - Load spec.md and extract specs
+  - Generate tasks
+  - Generate dependency graph
 
 ## Step 2: Create Task Checkpoint
 
-`docs/.checkpoints/{feature}-task.md` 생성
+`docs/.checkpoints/{feature}/task.md` 생성
 
-```markdown
-# auth-login - Task Checkpoint
+`.cursor/templates/checkpoint-task.md` 파일을 활용하여 내용을 채웁니다. **반드시 템플릿 파일에서 시작해야 합니다.**
 
-## Metadata
-- feature: auth-login
-- stage: task
-- status: in_progress
-- created: 2026-01-29
-- depends_on: 
-  - docs/.checkpoints/auth-login-specify.md
-  - docs/.checkpoints/auth-login-plan.md
-```
-
-## Step 3: Draft Task List
-
-specify의 Functional Requirements와 plan의 Component Design을 기반으로 태스크 초안을 작성합니다.
-
-### Task ID 규칙
-- `TASK-{NNN}`: 순차 번호
-- 예: TASK-001, TASK-002, ...
-
-### 태스크 분해 기준
-1. **단일 책임**: 각 태스크는 하나의 목적
-2. **테스트 가능**: 완료 기준 명확
-3. **의존성 최소화**: 독립적 작업 가능
-4. **적정 크기**: 1-4시간 분량
-
-```markdown
-## Content
-
-### Task List
-| Task ID | Description | Dependencies | Effort |
-|---------|-------------|--------------|--------|
-| TASK-001 | 프로젝트 초기 설정 | - | S |
-| TASK-002 | User 엔티티 및 DB 스키마 | TASK-001 | M |
-| TASK-003 | 인증 API 엔드포인트 | TASK-002 | M |
-| TASK-004 | JWT 토큰 유틸리티 | TASK-001 | S |
-| TASK-005 | 로그인 컴포넌트 | TASK-003, TASK-004 | M |
-| TASK-006 | 통합 테스트 | TASK-005 | M |
-```
-
-Effort: S(Small, <1h), M(Medium, 1-4h), L(Large, >4h)
 
 ## Step 4: Run Clarify
 
-clarify skill을 호출하여 태스크 관련 모호함을 해소합니다.
+`clarify` skill을 호출하여 태스크 관련 모호함을 해소합니다.
+
+이전 단계에서 모호함이 해결되었어도 최대한 재검토하여 모호함을 지워야 합니다.
 
 **Clarify 포커스 카테고리** (task 단계):
 - Interaction & UX
@@ -109,24 +83,8 @@ clarify skill을 호출하여 태스크 관련 모호함을 해소합니다.
 - Completion Signals (필수)
 - Misc
 
-### 예상 질문들
-
-```markdown
-**테스트 전략**
-**Recommended:** Option B - 균형잡힌 커버리지
-
-| Option | Description |
-|--------|-------------|
-| A | Unit tests only |
-| B | Unit + Integration tests |
-| C | Unit + Integration + E2E |
-
----
-
-**태스크 우선순위**
-**Suggested:** 백엔드 → 프론트엔드 순서 - API가 먼저 있어야 UI 테스트 가능
-
-Reply "yes" to accept, or provide different order.
+```text
+/clarify docs/.checkpoints/{feature}/task.md
 ```
 
 ## Step 5: Finalize Tasks
@@ -180,6 +138,8 @@ flowchart TD
 
 ## Step 6: Completion Message
 
+**사용자에게 A(yes), B(no), C(other...)로 질문을 출력합니다.**
+
 ```markdown
 ## Task 완료
 
@@ -219,7 +179,7 @@ Reply: yes, no, or another command
 
 ## Output
 
-- 생성: `docs/.checkpoints/{feature}-task.md`
+- 생성: `docs/.checkpoints/{feature}/task.md`
 - 상태: Ready
 - 다음 단계: /implement 추천
 

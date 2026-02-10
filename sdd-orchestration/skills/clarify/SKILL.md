@@ -1,17 +1,23 @@
 ---
 name: clarify
-description: Ambiguity Detection & Clarification Loop. 모든 단계(specify, plan, task, revise)에서 호출되어 모호함을 탐지하고 해소합니다. 체크포인트 문서를 업데이트합니다.
+description: Ambiguity Detection & Clarification Loop. 기능 구현 이전 여러 선택지 중 하나를 확정합니다.
 ---
 
-# Clarify Skill
+## User Input
 
-모호함을 탐지하고 해소하는 핵심 프로세스입니다. specify, plan, task, revise 단계에서 필수로 호출됩니다.
+```text
+$ARGUMENTS
+```
+
+You **MUST** consider the user input before proceeding (if not empty).
+
+Goal: Detect and reduce ambiguity or missing decision points in the active feature specification and record the clarifications directly in the spec file.
+
 
 ## When to Use
 
-- `/specify`, `/plan`, `/task`, `/revise` 실행 시 자동 호출
-- 체크포인트 문서가 존재할 때
-- 모호함 해소가 필요할 때
+- `/specify`, `/plan`, `/task`, `/revise` 스킬 실행 중 
+- 선택지 중 하나를 골라야 하는 경우 
 
 ## Process
 
@@ -37,9 +43,9 @@ description: Ambiguity Detection & Clarification Loop. 모든 단계(specify, pl
 
 ```
 # 체크포인트 경로
-docs/.checkpoints/{feature}-specify.md
-docs/.checkpoints/{feature}-plan.md
-docs/.checkpoints/{feature}-task.md
+docs/.checkpoints/{feature}/specify.md
+docs/.checkpoints/{feature}/plan.md
+docs/.checkpoints/{feature}/task.md
 ```
 
 의존 관계:
@@ -95,33 +101,49 @@ where:
 - clarity: Clear=1.0, Partial=0.5, Missing=0.0
 ```
 
-최대 5개의 질문을 큐에 추가합니다.
+최대 10개의 질문을 큐에 추가합니다.
 
-## Step 5: Ask One Question
+- If no meaningful ambiguities found (or all potential questions would be low-impact), respond: "No critical ambiguities detected worth formal clarification." and suggest proceeding.
+
+## Step 5: Sequential questioning loop (interactive)
 
 **한 번에 1개 질문만** 출력합니다.
 
-### Multiple Choice Format
+사용자가 선택할 수 있도록 객관식 질문을 출력합니다.
 
-```markdown
-**Recommended:** Option A - <1-2문장 추천 이유>
+  - For multiple‑choice questions:
+       - **Analyze all options** and determine the **most suitable option** based on:
+          - Best practices for the project type
+          - Common patterns in similar implementations
+          - Risk reduction (security, performance, maintainability)
+          - Alignment with any explicit project goals or constraints visible in the spec
+       - Present your **recommended option prominently** at the top with clear reasoning (1-2 sentences explaining why this is the best choice).
+       - Format as: `**Recommended:** Option [X] - <reasoning>`
+       - Then render all options as a Markdown table:
 
-| Option | Description |
-|--------|-------------|
-| A | <설명> |
-| B | <설명> |
-| C | <설명> |
+       | Option | Description |
+       |--------|-------------|
+       | A | <Option A description> |
+       | B | <Option B description> |
+       | C | <Option C description> (add D/E as needed up to 5) |
+       | Short | Provide a different short answer (<=5 words) (Include only if free-form alternative is appropriate) |
 
-Reply with option letter, "yes"/"recommended", or short answer (<=5 words).
-```
-
-### Short Answer Format
-
-```markdown
-**Suggested:** <제안 답변> - <간단한 이유>
-
-Format: Short answer (<=5 words). Reply "yes"/"suggested" to accept, or provide your own.
-```
+       - After the table, add: `You can reply with the option letter (e.g., "A"), accept the recommendation by saying "yes" or "recommended", or provide your own short answer.`
+    - For short‑answer style (no meaningful discrete options):
+       - Provide your **suggested answer** based on best practices and context.
+       - Format as: `**Suggested:** <your proposed answer> - <brief reasoning>`
+       - Then output: `Format: Short answer (<=5 words). You can accept the suggestion by saying "yes" or "suggested", or provide your own answer.`
+    - After the user answers:
+       - If the user replies with "yes", "recommended", or "suggested", use your previously stated recommendation/suggestion as the answer.
+       - Otherwise, validate the answer maps to one option or fits the <=5 word constraint.
+       - If ambiguous, ask for a quick disambiguation (count still belongs to same question; do not advance).
+       - Once satisfactory, record it in working memory (do not yet write to disk) and move to the next queued question.
+    - Stop asking further questions when:
+       - All critical ambiguities resolved early (remaining queued items become unnecessary), OR
+       - User signals completion ("done", "good", "no more"), OR
+       - You reach 5 asked questions.
+    - Never reveal future queued questions in advance.
+    - If no valid questions exist at start, immediately report no critical ambiguities.
 
 ## Step 6: Record Answer
 
@@ -165,16 +187,7 @@ Coverage Map의 모든 카테고리가 Clear가 되거나, 세션 질문 한도(
 - Functional Requirements (3 items added)
 - Data Model (entity relationships clarified)
 
-**Checkpoint**: docs/.checkpoints/{feature}-{stage}.md updated
-```
-
-## Integration with Other Skills
-
-```
-/specify → clarify() → checkpoint 생성/업데이트
-/plan    → clarify() → checkpoint 생성/업데이트
-/task    → clarify() → checkpoint 생성/업데이트
-/revise  → clarify() → checkpoint 업데이트
+**Checkpoint**: docs/.checkpoints/{feature}/{stage}.md updated
 ```
 
 ## Error Handling

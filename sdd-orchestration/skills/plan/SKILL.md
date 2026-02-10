@@ -1,21 +1,25 @@
 ---
 name: plan
-description: 아키텍처 설계 단계. specify 체크포인트를 참조하여 기술적 설계를 수행하고 plan 체크포인트를 생성합니다.
+description: 아키텍처 설계 단계. 스펙 명세를 바탕으로 기술적 설계를 진행합니다. 기능을 문서화한 후 구현하기 전 설계 단계에서 사용합니다. 
 ---
 
-# Plan Skill
+## User Input
 
-기능 명세를 바탕으로 아키텍처와 기술적 설계를 수행합니다.
+```text
+$ARGUMENTS
+```
+
+You **MUST** consider the user input before proceeding (if not empty).
 
 ## When to Use
 
-- `/plan` 명령 시
-- specify 완료 후 자동 전환 시
+- specify 완료 후
+- 기능 구현 전
 - "설계", "아키텍처", "구조" 키워드 시
 
 ## Prerequisites
 
-- `docs/.checkpoints/{feature}-specify.md` 존재 (status: ready)
+- `docs/.checkpoints/{feature}/specify.md` 존재 (status: ready)
 - 없으면 `/specify` 먼저 실행 안내
 
 ## Process
@@ -37,50 +41,94 @@ flowchart TD
 ## Step 1: Load Specify Checkpoint
 
 ```
-docs/.checkpoints/{feature}-specify.md 로드
+docs/.checkpoints/{feature}/specify.md 로드
 
 - Feature Overview 확인
 - Functional Requirements 확인
 - Acceptance Criteria 확인
 ```
 
+    a. read specify.md
+    b. Analyze existing features to understand:
+      - Existing architecture patterns used in the project
+      - Common technology stack and dependencies
+      - Shared data models and APIs
+      - Established conventions
+   
+   c. Identify related features from index:
+      - Features in the same category
+      - Features that share entities or data models
+      - Features this one depends on
+   
+   d. If dependencies found, read their artifacts:
+      - **data-model.md**: Reuse existing entity definitions
+      - **contracts/**: Understand existing API patterns
+      - **plan.md**: Reference architecture decisions
+   
+   e. Ensure consistency with existing implementations:
+      - Use same naming conventions
+      - Follow established patterns
+      - Extend rather than duplicate shared components
+
 ## Step 2: Create Plan Checkpoint
 
-`docs/.checkpoints/{feature}-plan.md` 생성
+`docs/.checkpoints/{feature}/plan.md` 생성
+`.cursor/templates/checkpoint-plan.md` 파일을 활용하여 내용을 채웁니다. **반드시 템플릿 파일에서 시작해야 합니다.**
 
-```markdown
-# auth-login - Plan Checkpoint
+**Extract unknowns from Technical Context** above:
+   - For each NEEDS CLARIFICATION → research task
+   - For each dependency → best practices task
+   - For each integration → patterns task
 
-## Metadata
-- feature: auth-login
-- stage: plan
-- status: in_progress
-- created: 2026-01-29
-- depends_on: 
-  - docs/.checkpoints/auth-login-specify.md
+**Check existing implementations**:
+   - If similar technology decisions exist in other features, reference them
+   - If shared infrastructure exists, plan to reuse rather than recreate
 
-## Clarifications
-### Session 2026-01-29
+**Generate human-readable summary sections** (IMPORTANT for human reviewers):
+   - **한줄 요약**: 기술적으로 무엇을 어떻게 구현하는지 한 문장으로 작성
+   - **TL;DR 테이블**: 기술 스택, 아키텍처, 주요 컴포넌트, 예상 복잡도, 주의사항을 테이블로 정리
+   - **아키텍처 개요 다이어그램**: Technical Context 기반으로 mermaid flowchart 생성
+     ```mermaid
+     flowchart TB
+         subgraph client [Client Layer]
+             UI[UI Components]
+         end
+         subgraph server [Server Layer]
+             API[API Layer]
+             Service[Service Layer]
+             Data[Data Layer]
+         end
+         UI --> API
+         API --> Service
+         Service --> Data
+     ```
+   - **데이터 흐름 다이어그램**: 주요 시나리오의 데이터 흐름을 sequence diagram으로 생성
+     ```mermaid
+     sequenceDiagram
+         participant User
+         participant API
+         participant Service
+         participant DB
+         User->>API: 요청
+         API->>Service: 처리
+         Service->>DB: 조회/저장
+         DB-->>Service: 결과
+         Service-->>API: 응답
+         API-->>User: 결과
+     ```
 
-## Coverage Map
-| Category | Status | Notes |
-|----------|--------|-------|
-| Functional Scope | Clear | (from specify) |
-| Domain & Data Model | Missing | |
-| Constraints | Missing | |
-...
-```
+
 
 ## Step 3: Run Clarify
 
-clarify skill을 호출하여 설계 관련 모호함을 해소합니다.
 
-**Clarify 포커스 카테고리** (plan 단계):
-- Domain & Data Model (필수)
-- Non-Functional (필수)
-- Integration
-- Constraints (필수)
-- Misc
+이전 단계에서 모호함이 해결되었어도 최대한 재검토하여 모호함을 지워야 합니다.
+
+`clarify` skill을 호출합니다.
+
+```text
+/clarify docs/.checkpoints/{feature}/plan.md
+```
 
 ### 예상 질문들
 
@@ -161,6 +209,8 @@ src/
 
 ## Step 5: Completion Message
 
+**사용자에게 A(yes), B(no), C(other...)로 질문을 출력합니다.**
+
 ```markdown
 ## Plan 완료
 
@@ -202,7 +252,7 @@ Reply: yes, no, or another command
 
 ## Output
 
-- 생성: `docs/.checkpoints/{feature}-plan.md`
+- 생성: `docs/.checkpoints/{feature}/plan.md`
 - 상태: Ready
 - 다음 단계: /task 추천
 

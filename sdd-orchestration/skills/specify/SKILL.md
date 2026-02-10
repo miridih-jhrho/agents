@@ -1,16 +1,19 @@
 ---
 name: specify
-description: 기능 명세화 단계. 사용자 요구사항을 분석하고 체크포인트를 생성합니다. clarify 프로세스를 통해 모호함을 해소합니다.
+description: 기능 명세화 단계. 사용자 요구사항을 분석하고 문서화합니다. 새로운 기능을 만들거나, 기존 기능을 수정하고자 할 때, 코드 구현 전 계획 단계에서 사용합니다. 
 ---
 
-# Specify Skill
+## User Input
 
-사용자 요구사항을 분석하여 기능 명세 체크포인트를 생성합니다.
+```text
+$ARGUMENTS
+```
 
 ## When to Use
 
+- 코드 구현 전 계획
 - 새 기능 개발 시작 시
-- `/specify` 또는 `/spec` 명령 시
+- 기존 기능을 수정 시
 - "명세", "기능 정의", "요구사항" 키워드 시
 
 ## Process
@@ -41,84 +44,97 @@ flowchart TD
 Reply "yes" to accept, or provide a different name (<=3 words, kebab-case).
 ```
 
-## Step 2: Create Checkpoint
+## Step 2: Load context
 
-`docs/.checkpoints/{feature}-specify.md` 파일을 생성합니다.
+   a. Read `docs/` if it exists
+   
+   b. Analyze existing features to understand:
+      - What features already exist in this project
+      - Which categories are defined
+      - Potential dependencies or related features
+      - Existing patterns and conventions used
+   
+   c. Identify related features:
+      - Same category as new feature (based on keywords in description)
+      - Features that might share data models or APIs
+      - Features the new one might depend on
+   
+   d. If related features found, read their spec.md files to:
+      - Understand existing terminology and conventions
+      - Identify shared entities or concepts
+      - Avoid duplicating existing functionality
+      - Reference existing features in the new spec if appropriate
 
-```markdown
-# auth-login - Specify Checkpoint
+### specify 
 
-## Metadata
-- feature: auth-login
-- stage: specify
-- status: in_progress
-- created: 2026-01-29
-- depends_on: []
+    1. Parse user description from Input
+       If empty: ERROR "No feature description provided"
+    2. Extract key concepts from description
+       Identify: actors, actions, data, constraints
+    3. **Generate human-readable summary sections** (IMPORTANT for human reviewers):
+       - **한줄 요약**: 이 기능이 무엇인지 한 문장으로 작성
+       - **TL;DR 테이블**: 목적, 대상 사용자, 핵심 기능, 범위를 테이블로 정리
+       - **사용자 흐름 다이어그램**: User Scenarios 기반으로 mermaid flowchart 생성
+         ```mermaid
+         flowchart LR
+             A[시작] --> B[주요 액션 1]
+             B --> C[주요 액션 2]
+             C --> D[완료]
+         ```
+    4. **Reference existing features** (from Step 2):
+       - If this feature depends on existing features, note in spec
+       - Use consistent terminology with related features
+       - Reference shared entities from other specs
+    5. For unclear aspects:
+       - Make informed guesses based on context and industry standards
+       - Only mark with [NEEDS CLARIFICATION: specific question] if:
+         - The choice significantly impacts feature scope or user experience
+         - Multiple reasonable interpretations exist with different implications
+         - No reasonable default exists
+       - **LIMIT: Maximum 3 [NEEDS CLARIFICATION] markers total**
+       - Prioritize clarifications by impact: scope > security/privacy > user experience > technical details
+    6. Fill User Scenarios & Testing section
+       If no clear user flow: ERROR "Cannot determine user scenarios"
+    7. Generate Functional Requirements
+       Each requirement must be testable
+       Use reasonable defaults for unspecified details (document assumptions in Assumptions section)
+    8. Define Success Criteria
+       Create measurable, technology-agnostic outcomes
+       Include both quantitative metrics (time, performance, volume) and qualitative measures (user satisfaction, task completion)
+       Each criterion must be verifiable without implementation details
+    9. Identify Key Entities (if data involved)
+       - Include ER diagram if entities have relationships:
+         ```mermaid
+         erDiagram
+             Entity1 ||--o{ Entity2 : contains
+         ```
+       - Reference existing entities from related features if applicable
+    10. Return: SUCCESS (spec ready for planning)
 
-## Clarifications
-### Session 2026-01-29
+## Step 3: Create Checkpoint
 
-## Coverage Map
-| Category | Status | Notes |
-|----------|--------|-------|
-| Functional Scope | Missing | |
-...
+`docs/.checkpoints/{feature}/specify.md` 파일을 생성합니다.
 
-## Content
-### Feature Overview
-### Functional Requirements
-### Out of Scope
-### Acceptance Criteria
+`.cursor/templates/checkpoint-specify.md` 파일을 활용하여 내용을 채웁니다. **반드시 템플릿 파일에서 시작해야 합니다.**
 
-## Open Questions
-## Next Step
-→ /plan
+## Step 4: Run Clarify
+
+`clarify` skill을 호출합니다.
+
+```text
+/clarify docs/.checkpoints/{feature}/specify.md
 ```
 
-## Step 3: Run Clarify
+## Step 5: Update Checkpoint
 
-clarify skill을 호출하여 모호함을 해소합니다.
-
-**Clarify 포커스 카테고리** (specify 단계):
-- Functional Scope (필수)
-- Domain & Data Model
-- Interaction & UX
-- Terminology
-- Completion Signals
-- Misc
-
-## Step 4: Update Checkpoint
-
-clarify 완료 후 체크포인트를 업데이트합니다.
+체크포인트를 업데이트합니다.
 
 - status: `in_progress` → `ready`
 - Coverage Map 업데이트
 - Content 섹션 채우기
+- clarify에서 정해진 내용 채우기 
 
-### Content 작성 가이드
-
-```markdown
-## Content
-
-### Feature Overview
-{clarify에서 확인된 기능 핵심 목적}
-
-### Functional Requirements
-- FR-001: {요구사항 1}
-- FR-002: {요구사항 2}
-
-### User Stories (선택)
-- As a {role}, I want to {action}, so that {benefit}
-
-### Out of Scope
-- {이번 구현에서 제외할 항목}
-
-### Acceptance Criteria
-- [ ] {수락 기준 1}
-- [ ] {수락 기준 2}
-```
-
-## Step 5: Completion Message
+## Step 6: Completion Message
 
 ```markdown
 ## Specify 완료
@@ -143,6 +159,8 @@ clarify 완료 후 체크포인트를 업데이트합니다.
 
 **다음 단계**: /plan - 아키텍처 설계
 
+**사용자에게 A(yes), B(no), C(other...)로 질문을 출력합니다.**
+
 | Option | Action |
 |--------|--------|
 | yes | /plan 바로 실행 |
@@ -151,7 +169,7 @@ clarify 완료 후 체크포인트를 업데이트합니다.
 Reply: yes, no, or another command
 ```
 
-## Step 6: Next Stage Transition
+## Step 7: Next Stage Transition
 
 사용자 응답에 따라:
 - `yes` → /plan skill 자동 실행
@@ -160,7 +178,7 @@ Reply: yes, no, or another command
 
 ## Output
 
-- 생성: `docs/.checkpoints/{feature}-specify.md`
+- 생성: `docs/.checkpoints/{feature}/specify.md`
 - 상태: Ready
 - 다음 단계: /plan 추천
 

@@ -1,15 +1,19 @@
 ---
 name: verify
-description: 검증 단계. test-agent와 review-agent를 호출하여 구현된 코드를 검증합니다.
+description: 검증 단계. 기능 구현 / 수정 이후 검증을 위해 사용합니다.
 ---
+## User Input
 
-# Verify Skill
+```text
+$ARGUMENTS
+```
 
-구현된 코드를 테스트하고 리뷰하여 품질을 검증합니다.
+You **MUST** consider the user input before proceeding (if not empty).
 
+\
 ## When to Use
 
-- `/verify` 명령 시
+- 코드 구현, 수정 완료 후 
 - implement 완료 후 자동 전환 시
 - revise 완료 후 재검증 시
 - "검증", "테스트", "리뷰" 키워드 시
@@ -36,13 +40,13 @@ flowchart TD
 체크포인트에서 검증 기준을 로드합니다.
 
 ```
-docs/.checkpoints/{feature}-specify.md
+docs/.checkpoints/{feature}/specify.md
 - Acceptance Criteria
 
-docs/.checkpoints/{feature}-task.md
+docs/.checkpoints/{feature}/task.md
 - Task Details (각 태스크의 Test Strategy)
 
-docs/.checkpoints/{feature}-plan.md
+docs/.checkpoints/{feature}/plan.md
 - Technical Decisions
 - Non-Functional Requirements
 ```
@@ -168,6 +172,8 @@ Task(
 
 ## Step 5: Verification Report
 
+**사용자에게 A(yes), B(no), C(other...)로 질문을 출력합니다.**
+
 ### 성공 시
 
 ```markdown
@@ -199,7 +205,6 @@ Task(
 | no | 대기 (나중에 수동 실행) |
 | fix | Warning 수정 후 재검증 |
 
-Reply: yes, no, fix, or another command
 ```
 
 ### 실패 시

@@ -1,22 +1,27 @@
 ---
 name: revise
-description: 수정 단계. verify에서 발견된 이슈를 수정하고 체크포인트를 업데이트합니다. clarify를 통해 수정 방향을 확인합니다.
+description: 잘못된 코드를 수정합니다. 구현 후 검증 단계에서 발견된 이슈를 해결할 때 사용합니다.
 ---
 
-# Revise Skill
+## User Input
 
-검증에서 발견된 이슈를 수정하고 재검증을 준비합니다.
+```text
+$ARGUMENTS
+```
+
+You **MUST** consider the user input before proceeding (if not empty).
 
 ## When to Use
 
-- `/revise` 명령 시
 - verify 실패 후 자동 전환 시
 - "수정", "고치기", "fix" 키워드 시
 
 ## Prerequisites
 
 - verify 리포트 (실패한 테스트, 리뷰 이슈)
-- 모든 체크포인트 접근 가능
+- `docs/.checkpoints/{feature}/specify.md` (status: ready)
+- `docs/.checkpoints/{feature}/plan.md` (status: ready)
+- `docs/.checkpoints/{feature}/task.md` (status: ready)
 
 ## Process
 
@@ -37,7 +42,8 @@ flowchart TD
 
 ## Step 1: Load Verify Report
 
-verify에서 생성된 리포트를 분석합니다.
+verify에서 생성된 리포트를 분석합니다. 또는 체크포인트 파일을 읽습니다.
+
 
 ```markdown
 ## 발견된 이슈
@@ -54,48 +60,39 @@ verify에서 생성된 리포트를 분석합니다.
 2. 매직 넘버 사용
 ```
 
-## Step 2: Clarify for Fix Direction
+```
+docs/.checkpoints/{feature}/specify.md
+- Functional Requirements
+- Acceptance Criteria
 
-수정 방향에 대해 clarify를 수행합니다.
+docs/.checkpoints/{feature}/plan.md
+- Technology Stack
+- Component Design
+- File Structure
+- Technical Decisions
+
+docs/.checkpoints/{feature}/task.md
+- Task List
+- Implementation Order
+- Task Details
+```
+
+- **REQUIRED**: Read task.md for the complete task list and execution plan
+- **REQUIRED**: Read plan.md for tech stack, architecture, and file structure
+- **IF EXISTS**: Read /docs and load context from existing documents. 
+- **IF EXISTS**: Read code referenced from /docs.
+
+## Step 2: Clarify for Fix Direction
 
 **Clarify 포커스 카테고리** (revise 단계):
 - Edge Cases
 - Non-Functional (보안)
 - Misc
 
-### 예상 질문들
+`clarify` skill을 호출합니다.
 
-```markdown
-**테스트 실패 수정 방향**
-
-`auth.test.ts:45`: login should reject invalid credentials
-현재: 500 에러 반환, 예상: 401 에러
-
-**Recommended:** Option A - 적절한 에러 핸들링 추가
-
-| Option | Description |
-|--------|-------------|
-| A | catch 블록에서 401 반환하도록 수정 |
-| B | 입력 검증 로직 추가 |
-| C | 테스트 케이스 수정 (현재 동작이 맞다면) |
-
-Reply with option letter or "yes" for recommended.
-```
-
-```markdown
-**보안 이슈 수정**
-
-SQL injection 취약점이 발견되었습니다.
-
-**Recommended:** Option A - 업계 표준 방식
-
-| Option | Description |
-|--------|-------------|
-| A | Parameterized query로 변경 |
-| B | ORM 사용 (새로운 의존성) |
-| C | 입력값 sanitize 함수 추가 |
-
-Reply with option letter or "yes" for recommended.
+```text
+/clarify `수정사항`
 ```
 
 ## Step 3: Apply Fixes
@@ -126,8 +123,44 @@ Reply with option letter or "yes" for recommended.
 ✓ 완료
 
 **user.test.ts:30 수정 중...**
-...
 ```
+```
+
+### 사용자 확인
+
+- 코드 구현이 완료된 경우에는 **반드시 사용자 리뷰**를 받습니다.
+- 구현한 코드를 정리하여 사용자가 알아보기 쉽도록 출력한 후 사용자에게 질문합니다. 응답은 A 또는 B로, A를 선택하는 경우 다음 커밋을 하거나 다음 단계로 진입합니다. B 선택에서는 사용자가 직접 수정 사항을 입력받아 수정합니다.
+
+#### 질문 예시
+
+```text
+## TASK-001 구현 완료
+
+### 변경된 파일
+| 파일 | 변경 내용 |
+|------|----------|
+| `src/auth/auth.service.ts` | JWT 토큰 생성 로직 추가 |
+| `src/auth/auth.controller.ts` | 로그인 엔드포인트 구현 |
+| `src/auth/dto/login.dto.ts` | 로그인 요청 DTO 생성 |
+
+### 핵심 구현
+- bcrypt를 사용한 비밀번호 해시 비교
+- JWT 토큰 만료 시간: 1시간
+- Refresh token은 다음 태스크에서 구현 예정
+---
+```
+구현 코드 
+```java
+```
+
+```text
+
+**확인해 주세요:**
+1. 구현이 요구사항과 일치하나요?
+2. 코드 스타일/패턴에 수정이 필요한가요?
+3. 커밋 후 다음 태스크로 진행해도 될까요?
+```
+
 
 ## Step 4: Update Checkpoint
 
@@ -141,26 +174,52 @@ Reply with option letter or "yes" for recommended.
 ```markdown
 ## 체크포인트 업데이트
 
-**{feature}-task.md**:
+**{feature}/task.md**:
 - TASK-003 Acceptance Criteria 업데이트
   - [추가] 잘못된 인증 시 401 반환
 
-**{feature}-plan.md**:
+**{feature}/plan.md**:
 - Technical Decisions 업데이트
   - [추가] SQL injection 방지: parameterized query 사용
 ```
 
 ## Step 5: Commit Fixes
 
-수정 사항을 커밋합니다.
+#### Commit Message Format
+
+`.cursor/implement/ences/commit-convention.json`의 설정에 따라 커밋 메시지를 생성합니다.
+
+**형식**: `{issue_number} {message}`
+
+#### 이슈 번호 파싱
+
+브랜치 이름에서 이슈 번호를 자동으로 파싱합니다.
+
+
+파싱 스크립트: `.cursor/references/parse-issue-number.sh`
+
+
+#### Commit 메시지 예시
+
+| Commit Message | 설명 |
+|----------------|------|
+| `UNICORN-66265 JWT token 추가` | 새 기능 추가 |
+
+#### Commit 메시지 생성 프로세스
+
+1. 브랜치 이름에서 이슈 번호 파싱
+2. 변경 내용을 설명하는 메시지 작성
+3. 사용자 확인 후 커밋
 
 ```markdown
 **커밋 메시지 확인**
 
-**Suggested:** fix(auth): handle invalid credentials properly [TASK-003]
+**Issue Number**: `UNICORN-66265` (from branch: feature/UNICORN-66265-sdd)
+**Suggested:** `UNICORN-66265 유저 인증 구현`
 
 Reply "yes" to commit, or provide a different message.
 ```
+
 
 여러 수정이 있는 경우 각각 커밋하거나 하나로 묶을 수 있습니다:
 
@@ -176,6 +235,8 @@ Reply with option letter.
 ```
 
 ## Step 6: Completion Message
+
+**사용자에게 A(yes), B(no), C(other...)로 질문을 출력합니다.**
 
 ```markdown
 ## Revise 완료
@@ -203,8 +264,8 @@ Reply with option letter.
 | i9j0k1l | refactor(config): move secrets to env |
 
 ### Checkpoint Updates
-- {feature}-task.md: TASK-003 criteria 업데이트
-- {feature}-plan.md: security decision 추가
+- {feature}/task.md: TASK-003 criteria 업데이트
+- {feature}/plan.md: security decision 추가
 
 ---
 

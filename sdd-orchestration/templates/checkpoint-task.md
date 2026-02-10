@@ -6,8 +6,8 @@
 - status: in_progress
 - created: {{date}}
 - depends_on: 
-  - docs/.checkpoints/{{feature}}-specify.md
-  - docs/.checkpoints/{{feature}}-plan.md
+  - docs/.checkpoints/{{feature}}/specify.md
+  - docs/.checkpoints/{{feature}}/plan.md
 
 ## Clarifications
 ### Session {{date}}
