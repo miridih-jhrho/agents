@@ -80,7 +80,7 @@ Parse task.md structure and extract:
 
 ## Step 2: Task Execution Loop
 
-- 각 태스크를 하나씩 실행합니다. task가 완료된 경우 **반드시** 사용자에게 확인받습니다. 병렬 실행하지 않습니다.
+- 각 태스크를 하나씩 실행합니다. task가 완료된 경우 **반드시** 사용자에게 확인받습니다. **순차적으로 모든 todo를 실행하면 안됩니다.**
 
 ### Task 시작 메시지
 
@@ -146,7 +146,7 @@ Parse task.md structure and extract:
 
 ### Commit
 
-태스크 완료 시 사람이 인식 가능한 최소 단위가 되었다고 판단하는 경우 커밋합니다.
+사용자 확인 완료 시 커밋합니다.
 
 #### Commit Message Format
 
