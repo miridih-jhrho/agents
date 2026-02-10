@@ -187,7 +187,7 @@ docs/.checkpoints/{feature}/task.md
 
 #### Commit Message Format
 
-`.cursor/skills/implement/references/commit-convention.json`의 설정에 따라 커밋 메시지를 생성합니다.
+`.cursor/implement/ences/commit-convention.json`의 설정에 따라 커밋 메시지를 생성합니다.
 
 **형식**: `{issue_number} {message}`
 
@@ -196,7 +196,7 @@ docs/.checkpoints/{feature}/task.md
 브랜치 이름에서 이슈 번호를 자동으로 파싱합니다.
 
 
-파싱 스크립트: `.cursor/skills/implement/references/parse-issue-number.sh`
+파싱 스크립트: `.cursor/references/parse-issue-number.sh`
 
 
 #### Commit 메시지 예시

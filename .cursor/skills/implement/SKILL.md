@@ -152,7 +152,7 @@ Parse task.md structure and extract:
 
 #### Commit Message Format
 
-`./references/commit-convention.json`의 설정에 따라 커밋 메시지를 생성합니다.
+`.cursor/references/commit-convention.json`의 설정에 따라 커밋 메시지를 생성합니다.
 
 **형식**: `{issue_number} {message}`
 
@@ -161,7 +161,7 @@ Parse task.md structure and extract:
 브랜치 이름에서 이슈 번호를 자동으로 파싱합니다.
 
 
-파싱 스크립트: `./references/parse-issue-number.sh`
+파싱 스크립트: `.cursor/references/parse-issue-number.sh`
 
 
 #### Commit 메시지 예시
