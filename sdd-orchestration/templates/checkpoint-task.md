@@ -16,16 +16,8 @@
 ## Coverage Map
 | Category | Status | Notes |
 |----------|--------|-------|
-| Functional Scope | Clear | (from specify) |
-| Domain & Data Model | Clear | (from plan) |
-| Interaction & UX | Missing | |
-| Non-Functional | Missing | |
-| Integration | Missing | |
 | Edge Cases | Missing | |
 | Constraints | Clear | (from plan) |
-| Terminology | Missing | |
-| Completion Signals | Missing | |
-| Misc | Missing | |
 
 ## Content
 

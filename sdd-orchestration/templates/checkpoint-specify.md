@@ -15,15 +15,11 @@
 | Category | Status | Notes |
 |----------|--------|-------|
 | Functional Scope | Missing | |
-| Domain & Data Model | Missing | |
 | Interaction & UX | Missing | |
 | Non-Functional | Missing | |
-| Integration | Missing | |
-| Edge Cases | Missing | |
 | Constraints | Missing | |
 | Terminology | Missing | |
 | Completion Signals | Missing | |
-| Misc | Missing | |
 
 ## Content
 

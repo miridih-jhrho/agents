@@ -121,10 +121,7 @@ docs/.checkpoints/{feature}/specify.md 로드
 
 ## Step 3: Run Clarify
 
-
-이전 단계에서 모호함이 해결되었어도 최대한 재검토하여 모호함을 지워야 합니다.
-
-`clarify` skill을 호출합니다.
+**반드시** `clarify` skill을 호출합니다.
 
 ```text
 /clarify docs/.checkpoints/{feature}/plan.md

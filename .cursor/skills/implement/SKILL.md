@@ -78,9 +78,9 @@ Parse task.md structure and extract:
    - **Task details**: ID, description, file paths, parallel markers [P]
    - **Execution flow**: Order and dependency requirements
 
-## Step 2: Task Execution Loop
+## Step 2: Task Execution
 
-- 각 태스크를 하나씩 실행합니다. task가 완료된 경우 **반드시** 사용자에게 확인받습니다. **순차적으로 모든 todo를 실행하면 안됩니다.**
+- 각 태스크를 하나씩 실행합니다. task가 완료된 경우 **반드시** 사용자에게 확인받습니다. **순차적으로 모든 todo를 실행하면 안됩니다. 확인이 완료되어야 다음 task로 진행합니다.**
 
 ### Task 시작 메시지
 
