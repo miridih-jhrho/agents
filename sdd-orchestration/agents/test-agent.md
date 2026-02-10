@@ -1,6 +1,6 @@
 ---
 name: test-agent
-description: 테스트 실행 및 분석 에이전트. 코드 구현 후 검증 시에 사용합니다.
+description: 테스트 실행 및 분석 에이전트. Use PROACTIVELY for generating, maintaining, and running tests.
 tools: ["Shell", "Read", "Grep", "Glob"]
 model: fast
 readonly: true
