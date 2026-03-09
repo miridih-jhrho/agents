@@ -1,0 +1,20 @@
+{
+  "commit": {
+    "format": "{issue_number} {message}",
+    "issue_number": {
+      "source": "branch",
+      "parse_script": "./parse-issue-number.sh",
+      "branch_pattern": "^(feature|bugfix)/([A-Z]+-[0-9]+)",
+      "capture_group": 2
+    },
+    "examples": [
+      "UNICORN-66265 add JWT token validation",
+      "BUG-123 handle null response",
+      "TASK-456 add login integration tests"
+    ],
+    "rules": {
+      "max_subject_length": 72,
+      "require_issue_number": true
+    }
+  }
+}

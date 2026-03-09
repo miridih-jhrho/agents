@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "description": "Agentic Utils Hook Configuration",
+  "hooks": {
+    "sessionStart": [
+      {
+        "command": "node .cursor/scripts/hooks/session-start.js"
+      }
+    ],
+    "sessionEnd": [
+      {
+        "command": "node .cursor/scripts/hooks/session-end.js"
+      },
+      {
+        "type": "prompt",
+        "prompt": "~/.cursor/sessions/ 에 있는 파일 중 최근 파일 내용을 이번 세션 대화를 바탕으로 채워"
+      },
+      {
+        "command": "node .cursor/scripts/hooks/evaluate-session.js"
+      }
+    ],
+    "preCompact": [
+
+    ],
+    "preToolUse": [
+
+    ],
+    "postToolUse": [
+
+    ],
+    "afterFileEdit": [
+
+    ],
+    "stop": [
+
+    ]
+  }
+}
